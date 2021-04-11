@@ -11,17 +11,29 @@
         border: solid 3px red;
         color: red;
     }
+    .shooting-star-leave-to {
+        transform: translateX(150px) rotate(30deg);
+        opacity: 0;
+    }
+    .shooting-star-enter-active .shooting-star-leave-active {
+        transition: all .5s ease;
+    }
 </style>
 
 <div id="app">
     <div class="container">
         <div class="card mt-5">
             <h2 class="card-header">Near-Earth Objects</h2>
-            <div class="m-3" v-cloak v-if="numAsteroids > 0">
-                <p>Showing {{numAsteroids}} Items</p>
-                <p>{{closestObject}} that has the shortest miss distance</p>
+            <transition name="shooting-star">
+                <div class="m-3" v-cloak v-if="numAsteroids > 0 && showSummary">
+                    <p>Showing {{numAsteroids}} Items</p>
+                    <p>{{closestObject}} that has the shortest miss distance</p>
+                </div>
+            </transition>
+            <div class="m-3">
+                <a href="#" @click="showSummary = !showSummary">Show/Hide Summary</a>
             </div>
-            <table class="table table-striped">
+            <table class="table table-striped" :class="['table-dark', 'table-bordered']">
                 <thead class="thead-light">
                 <th>#</th>
                 <th>Name</th>
@@ -32,7 +44,6 @@
                 <tbody v-cloak>
                 <tr v-for="(a, index) in asteroids"  :key="a.neo_reference_id"
                     :class="{highlight: isMissingData(a), 'shadow-sm': true}">
-
                     <td>{{index + 1}}</td>
                     <td>{{a.name}}</td>
                     <td>{{getCloseApproachDate(a)}}</td>
@@ -58,7 +69,8 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            asteroids: []
+            asteroids: [],
+            showSummary: true
             // imgSrc: '',
             // imgTitle: ''
             // renders email address inside input
