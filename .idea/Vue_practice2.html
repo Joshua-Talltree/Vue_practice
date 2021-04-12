@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+<!--prevents the flicker of the head tag back to the form between loading-->
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<div id="app">
+    <div class="container row m-3">
+        <a-pod class="mr-3">
+            <h3 slot="title">#1</h3>
+            <p slot="caption">Here's today's A-Pod image!</p>
+        </a-pod>
+        <a-pod class="mr-3" date="2018-08-07">
+            <h3 slot="title">#2</h3>
+<!--            picture with date using slot scope method-->
+            <p slot="caption" slot-scope="pic">Here's the picture from {{pic.date}}</p>
+        </a-pod>
+        <a-pod class="mr-3" date="2018-08-22">
+            <h3 slot="title">#3</h3>
+            <!--            picture with date using slot scope method-->
+            <p slot="caption" slot-scope="pic">Here's the picture from {{pic.date}}</p>
+        </a-pod>
+        <a-pod class="mr-3" date="2018-08-09">
+            <h3 slot="title">#4</h3>
+            <!--            picture with date using slot scope method-->
+            <p slot="caption" slot-scope="pic">Here's the picture from {{pic.date}}</p>
+        </a-pod>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // component template must contain one root element
+    Vue.component('a-pod', {
+        // date for today and for the date that was input into the "a-pod" tag
+        // dynamic date data include with :date
+        template: '<div> \
+                        <slot name="title"><h3>Untitled</h3></slot> \
+                        <img width="300" height="200" :src="imgSrc" :title="imgTitle"> \
+                        <slot name="caption" :date="date"><p>unknown date</p></slot> \
+                   </div>',
+        // prop for date.
+        props: ['date'],
+        data: function () {
+            return {
+                imgSrc: '',
+                imgTitle: ''
+            };
+        },
+
+        created: function () {
+            this.fetchApod();
+        },
+        // fetch img from NASA/API calls made here
+        methods: {
+            fetchApod: function () {
+                var apiKey = 'FpKYi8JtNeYOGbHrDzSqgm1nLGahVL4b3gh6MnvD';
+                var url = 'https://api.nasa.gov/planetary/apod?api_key=' + apiKey;
+                // if statement to pull the date from the object, if there's a date
+                if (this.date) {
+                    url += '&date=' + this.date;
+                }
+                var self = this;
+                axios.get(url)
+                    .then(function (res) {
+                        self.imgSrc = res.data.url;
+                        self.imgTitle = res.data.title;
+                    });
+            },
+        }
+    });
+
+    // view render
+    var vm = new Vue({
+        el: '#app',
+    });
+</script>
